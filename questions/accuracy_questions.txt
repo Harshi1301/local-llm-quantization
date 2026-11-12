@@ -1,0 +1,26 @@
+ACCURACY QUESTION SET
+Instruction to prepend to each question: "Answer with only the final answer, no explanation."
+Run at temperature 0, seed 42, /clear between questions (or separate ollama run calls).
+Marking: 1 point if the answer contains the key answer; 0 otherwise.
+
+--- A. Facts (2) ---
+1. What is the capital of Australia?                                  -> Canberra
+2. What is the chemical symbol for gold?                              -> Au
+
+--- B. Arithmetic (2) ---
+3. What is 17 x 6?                                                    -> 102
+4. What is 25% of 240?                                                -> 60
+
+--- C. Simple logic (3) ---
+5. Which is larger: 0.8 or 0.75?                                      -> 0.8
+6. A farmer has 10 sheep. All but 3 run away. How many are left?      -> 3
+7. What comes next: 2, 4, 8, 16, ?                                    -> 32
+
+--- D. Two-step reasoning (3) ---
+8. Anna has 3 boxes with 8 apples each. She gives away 5 apples. How many apples does she have left?   -> 19
+9. A shirt costs 40 euros and is reduced by 20%. What is the new price in euros? -> 32
+10. Tom is 4 years older than Sara. Sara is 11. How old will Tom be in 5 years? -> 20
+
+NOTES / LIMITS
+- Only 10 questions: one question = 10 percentage points.
+

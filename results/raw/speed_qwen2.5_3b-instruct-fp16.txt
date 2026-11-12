@@ -1,0 +1,37 @@
+﻿Model: qwen2.5:3b-instruct-fp16
+Ollama version: 0.40.15
+Date: 2026-11-08T21:15:12
+
+--- Run 1 ---
+total duration:       128.432 s
+load duration:        9.184 s
+prompt eval count:    51 token(s)
+prompt eval duration: 1.525 s
+prompt eval rate:     33.45 tokens/s
+eval count:           356 token(s)
+eval duration:        117.712 s
+eval rate:            3.02 tokens/s
+
+Loaded model size in memory: 6.42 GB (of which GPU/VRAM: 0 GB) | context length: 4096
+
+--- Run 2 ---
+total duration:       118.571 s
+load duration:        0.023 s
+prompt eval count:    51 token(s)
+prompt eval duration: 0.307 s
+prompt eval rate:     165.94 tokens/s
+eval count:           356 token(s)
+eval duration:        118.215 s
+eval rate:            3.01 tokens/s
+
+--- Run 3 ---
+total duration:       115.726 s
+load duration:        0.018 s
+prompt eval count:    51 token(s)
+prompt eval duration: 0.36 s
+prompt eval rate:     141.53 tokens/s
+eval count:           356 token(s)
+eval duration:        115.332 s
+eval rate:            3.09 tokens/s
+
+AVERAGE eval rate: 3.04 tokens/s (+- 0.04) over 3 runs

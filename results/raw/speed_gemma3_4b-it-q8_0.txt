@@ -1,0 +1,37 @@
+﻿Model: gemma3:4b-it-q8_0
+Ollama version: 0.40.15
+Date: 2026-11-09T15:30:33
+
+--- Run 1 ---
+total duration:       89.851 s
+load duration:        10.439 s
+prompt eval count:    32 token(s)
+prompt eval duration: 1.213 s
+prompt eval rate:     26.37 tokens/s
+eval count:           257 token(s)
+eval duration:        78.181 s
+eval rate:            3.29 tokens/s
+
+Loaded model size in memory: 4.53 GB (of which GPU/VRAM: 0 GB) | context length: 4096
+
+--- Run 2 ---
+total duration:       74.24 s
+load duration:        0.02 s
+prompt eval count:    32 token(s)
+prompt eval duration: 0.605 s
+prompt eval rate:     52.9 tokens/s
+eval count:           257 token(s)
+eval duration:        73.566 s
+eval rate:            3.49 tokens/s
+
+--- Run 3 ---
+total duration:       86.125 s
+load duration:        0.023 s
+prompt eval count:    32 token(s)
+prompt eval duration: 0.917 s
+prompt eval rate:     34.89 tokens/s
+eval count:           257 token(s)
+eval duration:        85.169 s
+eval rate:            3.02 tokens/s
+
+AVERAGE eval rate: 3.27 tokens/s (+- 0.24) over 3 runs

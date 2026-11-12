@@ -1,0 +1,37 @@
+﻿Model: llama3.2:3b-instruct-fp16
+Ollama version: 0.40.15
+Date: 2026-11-08T21:04:49
+
+--- Run 1 ---
+total duration:       110.939 s
+load duration:        10.186 s
+prompt eval count:    47 token(s)
+prompt eval duration: 1.462 s
+prompt eval rate:     32.14 tokens/s
+eval count:           290 token(s)
+eval duration:        99.279 s
+eval rate:            2.92 tokens/s
+
+Loaded model size in memory: 6.98 GB (of which GPU/VRAM: 0 GB) | context length: 4096
+
+--- Run 2 ---
+total duration:       101.291 s
+load duration:        0.03 s
+prompt eval count:    47 token(s)
+prompt eval duration: 0.32 s
+prompt eval rate:     146.78 tokens/s
+eval count:           290 token(s)
+eval duration:        100.889 s
+eval rate:            2.87 tokens/s
+
+--- Run 3 ---
+total duration:       99.838 s
+load duration:        0.017 s
+prompt eval count:    47 token(s)
+prompt eval duration: 0.396 s
+prompt eval rate:     118.61 tokens/s
+eval count:           290 token(s)
+eval duration:        99.408 s
+eval rate:            2.92 tokens/s
+
+AVERAGE eval rate: 2.9 tokens/s (+- 0.03) over 3 runs

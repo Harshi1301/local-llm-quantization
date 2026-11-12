@@ -1,0 +1,18 @@
+﻿Model: llama3.2:3b
+KV cache type (label): q4_0
+Ollama version: 0.40.15
+Date: 2026-11-10T15:28:00
+
+--- KV q4_0 | num_ctx 16384 ---
+context length (server):  16384
+RAM (model + KV cache):   2.74 GB
+total duration:           1598.77 s
+load duration:            2.136 s
+prompt eval count:        8194 token(s)
+prompt eval duration:     1566.528 s
+prompt eval rate:         5.23 tokens/s
+eval count:               64 token(s)
+eval duration:            30.051 s
+eval rate:                2.13 tokens/s
+answer: The library was a place of wonder, a sanctuary for those who sought knowledge and escape. Its doors opened at nine in the morning, and its patrons flocked to it, eager to devour the words within its walls. The library's hours were a constant, a reassuring rhythm that brought comfort to those who relied on it
+

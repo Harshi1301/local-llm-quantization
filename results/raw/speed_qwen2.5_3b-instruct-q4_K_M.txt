@@ -1,0 +1,37 @@
+﻿Model: qwen2.5:3b-instruct-q4_K_M
+Ollama version: 0.40.15
+Date: 2026-11-09T14:56:56
+
+--- Run 1 ---
+total duration:       84.552 s
+load duration:        4.084 s
+prompt eval count:    51 token(s)
+prompt eval duration: 1.114 s
+prompt eval rate:     45.78 tokens/s
+eval count:           392 token(s)
+eval duration:        79.348 s
+eval rate:            4.94 tokens/s
+
+Loaded model size in memory: 2.17 GB (of which GPU/VRAM: 0 GB) | context length: 4096
+
+--- Run 2 ---
+total duration:       85.634 s
+load duration:        0.028 s
+prompt eval count:    51 token(s)
+prompt eval duration: 0.206 s
+prompt eval rate:     247.12 tokens/s
+eval count:           367 token(s)
+eval duration:        85.365 s
+eval rate:            4.3 tokens/s
+
+--- Run 3 ---
+total duration:       76.371 s
+load duration:        0.018 s
+prompt eval count:    51 token(s)
+prompt eval duration: 0.235 s
+prompt eval rate:     216.93 tokens/s
+eval count:           367 token(s)
+eval duration:        76.082 s
+eval rate:            4.82 tokens/s
+
+AVERAGE eval rate: 4.69 tokens/s (+- 0.34) over 3 runs

@@ -1,0 +1,15 @@
+﻿Model: llama3.2:3b-instruct-fp16
+Date: 2026-11-08T21:13:34
+
+Q1 [OK ] key=Canberra | answer: Canberra.
+Q2 [OK ] key=Au | answer: Au
+Q3 [OK ] key=102 | answer: 102
+Q4 [OK ] key=60 | answer: 60.
+Q5 [OK ] key=0.8 | answer: 0.8
+Q6 [OK ] key=3 | answer: 3.
+Q7 [OK ] key=32 | answer: 32.
+Q8 [OK ] key=19 | answer: 19
+Q9 [OK ] key=32 | answer: 32 euros.
+Q10 [BAD] key=20 | answer: 15.
+
+SCORE: 9 / 10

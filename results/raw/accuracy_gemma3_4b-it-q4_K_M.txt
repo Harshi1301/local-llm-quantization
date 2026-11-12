@@ -1,0 +1,15 @@
+﻿Model: gemma3:4b-it-q4_K_M
+Date: 2026-11-09T15:47:23
+
+Q1 [OK ] key=Canberra | answer: Canberra
+Q2 [OK ] key=Au | answer: Au
+Q3 [OK ] key=102 | answer: 102
+Q4 [OK ] key=60 | answer: 60
+Q5 [OK ] key=0.8 | answer: 0.8
+Q6 [OK ] key=3 | answer: 3
+Q7 [OK ] key=32 | answer: 32
+Q8 [BAD] key=19 | answer: 21
+Q9 [OK ] key=32 | answer: 32
+Q10 [BAD] key=20 | answer: 16
+
+SCORE: 8 / 10

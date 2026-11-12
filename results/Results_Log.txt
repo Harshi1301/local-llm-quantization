@@ -1,0 +1,574 @@
+RESULTS LOG - Local LLMs on CPU-only laptop (i7-1165G7, 15.7 GB RAM, no dedicated GPU)
+Ollama 0.40.15, models in D:\OllamaModels
+
+METHOD
+- Temperature 0, seed 42, context 4096, 100% CPU.
+- Each run = separate API call (no shared context, same effect as /clear).
+- Speed prompt: "List the eight planets of the solar system in order from the Sun, and give one short fact about each."
+  Eval rate only (generated tokens / generation time), 3 runs, average +- sample std dev.
+- RAM: model size in memory (ollama ps / /api/ps), GB = 1000^3.
+- Accuracy: 10 questions with answer key (accuracy_questions.txt), prefix "Answer with only the final answer, no explanation."
+  Auto-marked by key text, answers also checked by hand. 1 question = 10 percentage points.
+- Scripts: run_speed.ps1, run_accuracy.ps1 (folder: Documents\Harshita\Seminar\claude)
+
+
+=====================================================================================
+SUMMARY TABLE
+=====================================================================================
+
++---------------------+-------+-------------+------------------+----------+----------+
+| Model               | Quant | File size   | Speed (tok/s)    | RAM (GB) | Accuracy |
++---------------------+-------+-------------+------------------+----------+----------+
+| Llama 3.2 3B        | FP16  | 6.4 GB      | 2.90 +- 0.03     | 6.98     | 9 / 10   |
+| Qwen2.5 3B          | FP16  | ~6.2 GB     | 3.04 +- 0.04     | 6.42     | 8 / 10   |
+| Gemma 3 4B          | FP16  | ~8.6 GB     | 2.16 +- 0.03     | 8.17     | 8 / 10   |
++---------------------+-------+-------------+------------------+----------+----------+
+| Llama 3.2 3B        | Q8_0  | ~3.4 GB     | 4.14 +- 0.39 (re)| 3.97     | 9 / 10   |
+| Llama 3.2 3B        | Q4_KM | 2.0 GB      | 6.48 +- 0.40     | 2.57     | 9 / 10   |
+| Qwen2.5 3B          | Q8_0  | ~3.3 GB     | 3.87 +- 0.38     | 3.52     | 8 / 10   |
+| Qwen2.5 3B          | Q4_KM | ~1.9 GB     | 4.69 +- 0.34     | 2.17     | 9 / 10   |
+| Gemma 3 4B          | Q8_0  | ~5.0 GB     | 3.27 +- 0.24     | 4.53     | 8 / 10   |
+| Gemma 3 4B          | Q4_KM | ~3.4 GB     | 5.50 +- 0.05     | 2.89     | 8 / 10   |
++---------------------+-------+-------------+------------------+----------+----------+
+
+
+=====================================================================================
+DETAIL: Llama 3.2 3B Instruct FP16 (baseline)  [llama3.2:3b-instruct-fp16]
+=====================================================================================
+
+FINAL RUN (new script, Ollama native metrics, num_ctx 4096, clean setup)
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 110.94 | 101.29 | 99.84  |
+| load duration (s)          | 10.19  | 0.03   | 0.02   |
+| prompt eval count (tokens) | 47     | 47     | 47     |
+| prompt eval duration (s)   | 1.46   | 0.32   | 0.40   |
+| prompt eval rate (tok/s)   | 32.14  | 146.78 | 118.61 |
+| eval count (tokens)        | 290    | 290    | 290    |
+| eval duration (s)          | 99.28  | 100.89 | 99.41  |
+| eval rate (tok/s)          | 2.92   | 2.87   | 2.92   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 2.90 +- 0.03 tok/s | RAM 6.98 GB | context 4096 | 100% CPU
+Prompt eval rate: only Run 1 (32.14 tok/s, cold) is a true prompt speed. Runs 2-3 are much
+faster because Ollama reuses its cache for the identical prompt. Use eval rate for comparison.
+
+EARLIER FIRST PASS (superseded, kept for history)
++---------------------------+-------+-------+-------+------------+
+| Method                    | Run 1 | Run 2 | Run 3 | Average    |
++---------------------------+-------+-------+-------+------------+
+| Manual (ollama run)       | 2.89  | 2.74  | 2.90  | 2.84+-0.09 |
+| Old script                | 2.97  | 3.02  | 2.87  | 2.95+-0.08 |
++---------------------------+-------+-------+-------+------------+
+All three measurements agree within about 0.1 tok/s.
+
+OTHER METRICS
++------------------------+---------------------------------------------+
+| Generated tokens       | 290 (identical every run)                   |
+| Prompt tokens          | 47                                          |
+| Context length         | 4096                                        |
+| Processor              | 100% CPU                                    |
+| RAM                    | ~7.0 GB (script showed 6.5 GiB = 7.0 GB)    |
++------------------------+---------------------------------------------+
+
+ACCURACY: 9 / 10  (confirmed with strict marking and num_ctx 4096: identical answers to first pass)
++------+-----------------+---------+--------+
+| Q    | Key             | Answer  | Result |
++------+-----------------+---------+--------+
+| 1    | Canberra        | Canberra| OK     |
+| 2    | Au              | Au      | OK     |
+| 3    | 102             | 102     | OK     |
+| 4    | 60              | 60      | OK     |
+| 5    | 0.8             | 0.8     | OK     |
+| 6    | 3               | 3       | OK     |
+| 7    | 32              | 32      | OK     |
+| 8    | 19              | 19      | OK     |
+| 9    | 32              | 32 euros| OK     |
+| 10   | 20              | 15      | WRONG  |
++------+-----------------+---------+--------+
+Q10: Tom is 4 years older than Sara (11), age in 5 years? Model gave 15 (current age), correct 20.
+Missed the last step of a two-step reasoning question.
+
+
+=====================================================================================
+DETAIL: Qwen2.5 3B Instruct FP16 (baseline)  [qwen2.5:3b-instruct-fp16]
+=====================================================================================
+
+FINAL RUN (new script, Ollama native metrics, num_ctx 4096, clean setup)
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 128.43 | 118.57 | 115.73 |
+| load duration (s)          | 9.18   | 0.02   | 0.02   |
+| prompt eval count (tokens) | 51     | 51     | 51     |
+| prompt eval duration (s)   | 1.53   | 0.31   | 0.36   |
+| prompt eval rate (tok/s)   | 33.45  | 165.94 | 141.53 |
+| eval count (tokens)        | 356    | 356    | 356    |
+| eval duration (s)          | 117.71 | 118.22 | 115.33 |
+| eval rate (tok/s)          | 3.02   | 3.01   | 3.09   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 3.04 +- 0.04 tok/s | RAM 6.42 GB | context 4096 | 100% CPU
+Prompt eval rate: only Run 1 (33.45 tok/s, cold) is a true prompt speed (cache effect in Runs 2-3).
+
+EARLIER FIRST PASS (superseded, noisy): 2.40, 2.39, 2.79 -> 2.53 +- 0.23 tok/s
+Cause of the lower first-pass numbers not proven (likely background load, setup not controlled).
+Lesson: uncontrolled runs can change the ranking of models -> keep the checklist for every model.
+
+ACCURACY: 8 / 10
++------+-----------------+--------------------------------------+--------+
+| Q    | Key             | Answer                               | Result |
++------+-----------------+--------------------------------------+--------+
+| 1-7  | (see question file) | all correct                      | OK     |
+| 8    | 19              | 29                                   | WRONG  |
+| 9    | 32              | 32 euros                             | OK     |
+| 10   | 20              | Tom will be 19 years old in 5 years. | WRONG  |
++------+-----------------+--------------------------------------+--------+
+Q8: 3 boxes x 8 apples = 24, gives away 5 -> 19. Model added instead of subtracting (29).
+Q10: Sara 11, Tom 15 now, in 5 years 20. Model gave 19.
+Both errors are in the two-step reasoning group (D). Q10 also wrong for Llama.
+
+
+=====================================================================================
+DETAIL: Gemma 3 4B it FP16 (baseline)  [gemma3:4b-it-fp16]
+=====================================================================================
+
+SPEED (new script, Ollama native metrics, num_ctx 4096, clean setup)
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 139.42 | 120.25 | 118.51 |
+| load duration (s)          | 15.61  | 0.02   | 0.02   |
+| prompt eval count (tokens) | 32     | 32     | 32     |
+| prompt eval duration (s)   | 3.46   | 0.78   | 0.94   |
+| prompt eval rate (tok/s)   | 9.25   | 40.87  | 34.12  |
+| eval count (tokens)        | 257    | 257    | 257    |
+| eval duration (s)          | 120.32 | 119.40 | 117.53 |
+| eval rate (tok/s)          | 2.14   | 2.15   | 2.19   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 2.16 +- 0.03 tok/s | RAM 8.17 GB | context 4096 | 100% CPU
+Prompt eval rate: only Run 1 (9.25 tok/s, cold) is a true prompt speed (cache effect in Runs 2-3).
+Prompt is 32 tokens for Gemma (51 Qwen, 47 Llama): different tokenizers.
+
+ACCURACY: 8 / 10
++------+-----------------+--------------------+--------+
+| Q    | Key             | Answer             | Result |
++------+-----------------+--------------------+--------+
+| 1-7  | (see question file) | all correct    | OK     |
+| 8    | 19              | 23                 | WRONG  |
+| 9    | 32              | 32                 | OK     |
+| 10   | 20              | 16                 | WRONG  |
++------+-----------------+--------------------+--------+
+Q8: 3 x 8 = 24, minus 5 = 19. Model gave 23. Q10: Tom is 15 now, 20 in 5 years. Model gave 16.
+
+
+=====================================================================================
+BASELINE SUMMARY ACROSS FAMILIES (FP16) - which questions each model got wrong
++------------+---------+---------+---------+
+| Question   | Llama   | Qwen    | Gemma   |
++------------+---------+---------+---------+
+| Q8  (19)   | ok      | WRONG   | WRONG   |
+| Q10 (20)   | WRONG   | WRONG   | WRONG   |
++------------+---------+---------+---------+
+All wrong answers are in the two-step reasoning group. Q1-Q7 and Q9 correct for all three.
+=====================================================================================
+
+
+=====================================================================================
+SPEED vs RAM CHECK (FP16): speed x memory = data read per second
+=====================================================================================
++---------------+----------+-------------+----------------+
+| Model         | RAM (GB) | tok/s       | RAM x tok/s    |
++---------------+----------+-------------+----------------+
+| Llama 3.2 3B  | 6.98     | 2.90        | 20.2 GB/s      |
+| Qwen2.5 3B    | 6.42     | 3.04        | 19.5 GB/s      |
+| Gemma 3 4B    | 8.17     | 2.16        | 17.6 GB/s      |
++---------------+----------+-------------+----------------+
+Roughly constant (~18-20 GB/s) -> speed is limited by memory bandwidth: each token reads the
+whole model from RAM. Rough estimate only (RAM includes KV cache and buffers).
+
+
+=====================================================================================
+QUANTIZED RESULTS
+=====================================================================================
+
+--- Llama 3.2 3B Q8_0  [llama3.2:3b-instruct-q8_0] ---
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 115.06 | 87.51  | 90.11  |
+| load duration (s)          | 11.63  | 0.02   | 0.02   |
+| prompt eval count (tokens) | 47     | 47     | 47     |
+| prompt eval duration (s)   | 6.14   | 0.28   | 0.30   |
+| prompt eval rate (tok/s)   | 7.66   | 167.21 | 157.58 |
+| eval count (tokens)        | 290    | 290    | 290    |
+| eval duration (s)          | 97.26  | 87.16  | 89.78  |
+| eval rate (tok/s)          | 2.98   | 3.33   | 3.23   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 3.18 +- 0.18 tok/s | RAM 3.97 GB | context 4096 | 100% CPU
+Run 1 is slower than Runs 2-3 (and its cold prompt eval is only 7.66 tok/s vs ~33 for FP16 models):
+first run after loading seems to include warm-up. Spread 0.18 is larger than FP16 runs.
+Runs 2-3 only: 3.28 tok/s.
+
+SURPRISE: RAM dropped 43% (6.98 -> 3.97 GB) but speed rose only 10% (2.90 -> 3.18 tok/s).
+Speed x RAM = 12.6 GB/s here vs ~20 GB/s for FP16 -> the "memory bandwidth only" model does not
+fully explain CPU speed. Likely the CPU also spends time converting 8-bit weights during
+the calculation (compute cost). To be checked with Q4_K_M results.
+>>> CORRECTION: this explanation was WRONG. See the Q8_0 RE-RUN below: the first Q8_0 run was disturbed.
+
+RE-RUN Llama 3.2 3B Q8_0 (second measurement, same script and settings; checklist repeated)
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 69.85  | 68.37  | 78.73  |
+| load duration (s)          | 3.15   | 0.02   | 0.02   |
+| prompt eval count (tokens) | 47     | 47     | 47     |
+| prompt eval duration (s)   | 1.48   | 0.21   | 0.28   |
+| prompt eval rate (tok/s)   | 31.84  | 227.97 | 168.60 |
+| eval count (tokens)        | 290    | 290    | 290    |
+| eval duration (s)          | 65.21  | 68.10  | 78.41  |
+| eval rate (tok/s)          | 4.45   | 4.26   | 3.70   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 4.14 +- 0.39 tok/s (confirmed by the script's own average line) | RAM 3.97 GB
+Speed x RAM = 16.4 GB/s -> now in line with FP16 (20.2) and Q4_KM (16.7). The "Q8_0 is odd" idea is dropped.
+First measurement (3.18 +- 0.18) is considered disturbed: its cold prompt eval was only 7.66 tok/s
+(vs 31.84 now and ~33 for the FP16 models) -> system was busy/slower in that run. Cause not proven.
+Both measurements are kept here; the re-run is used in the tables. Speed also falls across the 3 runs
+(4.45 -> 4.26 -> 3.70): possible heat/power throttling -> watch for it in later models.
+
+
+--- Qwen2.5 3B Q8_0  [qwen2.5:3b-instruct-q8_0] ---
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 85.82  | 89.12  | 95.48  |
+| load duration (s)          | 5.33   | 0.02   | 0.01   |
+| prompt eval count (tokens) | 51     | 51     | 51     |
+| prompt eval duration (s)   | 1.68   | 0.22   | 0.30   |
+| prompt eval rate (tok/s)   | 30.42  | 228.08 | 170.83 |
+| eval count (tokens)        | 337    | 337    | 337    |
+| eval duration (s)          | 78.81  | 88.83  | 95.16  |
+| eval rate (tok/s)          | 4.28   | 3.79   | 3.54   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 3.87 +- 0.38 tok/s | RAM 3.52 GB | context 4096 | 100% CPU
+Generated 337 tokens (Qwen FP16: 356) -> 8-bit rounding changed the wording.
+Speed x RAM = 13.6 GB/s.
+PATTERN: speed falls in every run (4.28 -> 3.79 -> 3.54), same downward trend as Llama Q8_0 re-run
+(4.45 -> 4.26 -> 3.70). The FP16 runs were flat. Suspected cause: CPU heat/power throttling during
+the ~90 s runs (NOT proven). Run 1 is likely closest to the "cool" speed. To investigate.
+
+ACCURACY: 8 / 10 (same score as FP16)
++------+-----+----------------------------------------+-----------------------------+
+| Q    | Key | Qwen Q8_0 answer                       | Qwen FP16 answer            |
++------+-----+----------------------------------------+-----------------------------+
+| 8    | 19  | 17  (WRONG)                            | 29  (WRONG)                 |
+| 10   | 20  | Tom will be 19 years old (WRONG)       | Tom will be 19 (WRONG)      |
++------+-----+----------------------------------------+-----------------------------+
+Q1-Q7 and Q9 correct. Same questions wrong as FP16, but Q8 gives a different wrong number.
+
+
+--- Qwen2.5 3B Q4_K_M  [qwen2.5:3b-instruct-q4_K_M] ---
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 84.55  | 85.63  | 76.37  |
+| load duration (s)          | 4.08   | 0.03   | 0.02   |
+| prompt eval count (tokens) | 51     | 51     | 51     |
+| prompt eval duration (s)   | 1.11   | 0.21   | 0.24   |
+| prompt eval rate (tok/s)   | 45.78  | 247.12 | 216.93 |
+| eval count (tokens)        | 392    | 367    | 367    |
+| eval duration (s)          | 79.35  | 85.37  | 76.08  |
+| eval rate (tok/s)          | 4.94   | 4.30   | 4.82   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 4.69 +- 0.34 tok/s | RAM 2.17 GB | context 4096 | 100% CPU
+Speed x RAM = 10.2 GB/s. Speedup vs Qwen FP16: 1.5x (Llama Q4_KM was 2.2x).
+Run 1 generated 392 tokens, Runs 2-3 generated 367 despite temperature 0 and seed 42:
+the answer is not identical across runs for this model (first run after load differs).
+Eval RATE is a per-token rate, so it is still comparable; note this in the paper.
+
+THROTTLING CHECK (Task Manager > CPU > Speed): 0.87 GHz after Run 1, 0.81 GHz after Run 3.
+INCONCLUSIVE: readings were taken after the runs, when the CPU is idle (idle clock is low).
+Speeds in this model did NOT fall every run (4.94 -> 4.30 -> 4.82), which weakens the
+steady-throttling idea. A reading during generation is still needed.
+
+ACCURACY: 9 / 10 (HIGHER than FP16 = 8 / 10)
++------+-----+-----------------------------+--------+
+| Q    | Key | Qwen Q4_KM answer           | Result |
++------+-----+-----------------------------+--------+
+| 8    | 19  | 29                          | WRONG  |
+| 10   | 20  | Tom will be 20 years old    | OK     |
++------+-----+-----------------------------+--------+
+Q1-Q7 and Q9 correct. Q10 now correct (FP16 and Q8_0 were wrong). Q8 wrong with the same number as FP16 (29).
+Do NOT read this as "4-bit is more accurate": one question on a 10-question set, and this model's
+output varies between runs. It shows that differences of 1 question are within noise.
+
+QWEN2.5 3B COMPLETE
++-------+----------+--------------+----------+----------+
+| Quant | File     | Speed tok/s  | RAM (GB) | Accuracy |
++-------+----------+--------------+----------+----------+
+| FP16  | ~6.2 GB  | 3.04 +- 0.04 | 6.42     | 8 / 10   |
+| Q8_0  | ~3.3 GB  | 3.87 +- 0.38 | 3.52     | 8 / 10   |
+| Q4_KM | ~1.9 GB  | 4.69 +- 0.34 | 2.17     | 9 / 10   |
++-------+----------+--------------+----------+----------+
+
+
+--- Gemma 3 4B Q8_0  [gemma3:4b-it-q8_0] ---
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 89.85  | 74.24  | 86.13  |
+| load duration (s)          | 10.44  | 0.02   | 0.02   |
+| prompt eval count (tokens) | 32     | 32     | 32     |
+| prompt eval duration (s)   | 1.21   | 0.61   | 0.92   |
+| prompt eval rate (tok/s)   | 26.37  | 52.90  | 34.89  |
+| eval count (tokens)        | 257    | 257    | 257    |
+| eval duration (s)          | 78.18  | 73.57  | 85.17  |
+| eval rate (tok/s)          | 3.29   | 3.49   | 3.02   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 3.27 +- 0.24 tok/s | RAM 4.53 GB | context 4096 | 100% CPU
+Speed x RAM = 14.8 GB/s. Speedup vs Gemma FP16: 1.5x (2.16 -> 3.27); RAM -45%.
+Speeds go 3.29 -> 3.49 -> 3.02 (not a steady decline). Same 257 tokens as FP16 (same answer text).
+
+ACCURACY: 8 / 10 (same as FP16, and the same wrong answers: Q8 -> 23, Q10 -> 16)
+
+
+--- Gemma 3 4B Q4_K_M  [gemma3:4b-it-q4_K_M] ---
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 48.28  | 45.80  | 46.08  |
+| load duration (s)          | 6.67   | 0.02   | 0.02   |
+| prompt eval count (tokens) | 32     | 32     | 32     |
+| prompt eval duration (s)   | 0.87   | 0.46   | 0.50   |
+| prompt eval rate (tok/s)   | 36.77  | 69.31  | 64.31  |
+| eval count (tokens)        | 222    | 251    | 251    |
+| eval duration (s)          | 40.74  | 45.29  | 45.52  |
+| eval rate (tok/s)          | 5.45   | 5.54   | 5.51   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 5.50 +- 0.05 tok/s | RAM 2.89 GB | context 4096 | 100% CPU
+Speed x RAM = 15.9 GB/s. Speedup vs Gemma FP16: 2.5x (2.16 -> 5.50); RAM -65%.
+Run 1 generated 222 tokens, Runs 2-3 generated 251 (FP16/Q8_0: 257): 4-bit changed the wording,
+and the answer differs between run 1 and later runs. Spread is small (+-0.05).
+
+ACCURACY: 8 / 10 (same as FP16; Q8 -> 21 (FP16: 23), Q10 -> 16 (same as FP16))
+
+
+=====================================================================================
+FINAL RESULTS - PART 1 (weight quantization), ALL 9 SETUPS MEASURED
+=====================================================================================
++---------------+-------+--------------+----------+----------+------------+-----------+
+| Model         | Quant | Speed tok/s  | RAM (GB) | Accuracy | Speedup vs | RAM saved |
+|               |       |              |          |          | FP16       | vs FP16   |
++---------------+-------+--------------+----------+----------+------------+-----------+
+| Llama 3.2 3B  | FP16  | 2.90 +- 0.03 | 6.98     | 9 / 10   | 1.00x      |  0%       |
+| Llama 3.2 3B  | Q8_0  | 4.14 +- 0.39 | 3.97     | 9 / 10   | 1.43x      | 43%       |
+| Llama 3.2 3B  | Q4_KM | 6.48 +- 0.40 | 2.57     | 9 / 10   | 2.23x      | 63%       |
++---------------+-------+--------------+----------+----------+------------+-----------+
+| Qwen2.5 3B    | FP16  | 3.04 +- 0.04 | 6.42     | 8 / 10   | 1.00x      |  0%       |
+| Qwen2.5 3B    | Q8_0  | 3.87 +- 0.38 | 3.52     | 8 / 10   | 1.27x      | 45%       |
+| Qwen2.5 3B    | Q4_KM | 4.69 +- 0.34 | 2.17     | 9 / 10   | 1.54x      | 66%       |
++---------------+-------+--------------+----------+----------+------------+-----------+
+| Gemma 3 4B    | FP16  | 2.16 +- 0.03 | 8.17     | 8 / 10   | 1.00x      |  0%       |
+| Gemma 3 4B    | Q8_0  | 3.27 +- 0.24 | 4.53     | 8 / 10   | 1.51x      | 45%       |
+| Gemma 3 4B    | Q4_KM | 5.50 +- 0.05 | 2.89     | 8 / 10   | 2.55x      | 65%       |
++---------------+-------+--------------+----------+----------+------------+-----------+
+
+MAIN FINDINGS
+1. 4-bit (Q4_K_M) is 1.5-2.6x faster and uses 63-66% less RAM than FP16 in all 3 families.
+2. 8-bit (Q8_0) gives 1.3-1.5x speed and 43-45% less RAM.
+3. Accuracy on the 10-question set stayed at 8-9 / 10 for every setup: no measurable loss.
+   All wrong answers are in the two-step reasoning questions (Q8, Q10).
+4. Speed x RAM is roughly 10-20 GB/s -> generation is mostly limited by memory bandwidth.
+
+CAVEATS FOR THE PAPER
+- 10 questions: one question = 10 points; 1-question differences (Qwen 8 vs 9) are noise.
+- Llama Q8_0 was measured twice (3.18 first, 4.14 re-run); first considered disturbed. Both kept in log.
+- Qwen Q4_KM and Gemma Q4_KM: answer length differs between run 1 and runs 2-3 even at temp 0, seed 42.
+- Speed spread is about +-0.4 for several quantized runs; throttling suspected but not shown.
+- Single laptop, CPU only, one prompt for speed, 3 runs per setup.
+
+NEXT: Experiment B - KV-cache type (f16 / q8_0 / q4_0) at several context lengths, then write the paper
+(preliminary paper due 2026-11-19).
+Q8: 3 x 8 = 24, minus 5 = 19.
+
+ACCURACY: 9 / 10 (same as FP16: Q1-Q9 correct, Q10 wrong -> 15 instead of 20, same wrong answer as FP16)
+
+
+--- Llama 3.2 3B Q4_K_M  [llama3.2:3b] ---
++----------------------------+--------+--------+--------+
+| Ollama metric              | Run 1  | Run 2  | Run 3  |
++----------------------------+--------+--------+--------+
+| total duration (s)         | 48.01  | 48.61  | 45.43  |
+| load duration (s)          | 4.28   | 0.02   | 0.02   |
+| prompt eval count (tokens) | 47     | 47     | 47     |
+| prompt eval duration (s)   | 0.84   | 0.14   | 0.16   |
+| prompt eval rate (tok/s)   | 55.99  | 344.59 | 301.49 |
+| eval count (tokens)        | 294    | 294    | 294    |
+| eval duration (s)          | 42.88  | 48.40  | 45.24  |
+| eval rate (tok/s)          | 6.86   | 6.07   | 6.50   |
++----------------------------+--------+--------+--------+
+AVERAGE eval rate: 6.48 +- 0.40 tok/s | RAM 2.57 GB | context 4096 | 100% CPU
+Generated 294 tokens (FP16 and Q8_0: 290) -> 4-bit rounding changed the wording of the answer.
+Spread 0.40 is the largest so far (here Run 1 was the fastest, opposite of Q8_0).
+Speed x RAM = 16.7 GB/s -> back near the FP16 value (~20 GB/s); Q8_0 (12.6 GB/s) is the outlier.
+
+ACCURACY: 9 / 10 (same as FP16 and Q8_0: Q10 wrong -> 15, same wrong answer)
+
+LLAMA 3.2 3B COMPLETE
++-------+----------+--------------+----------+----------+
+| Quant | File     | Speed tok/s  | RAM (GB) | Accuracy |
++-------+----------+--------------+----------+----------+
+| FP16  | 6.4 GB   | 2.90 +- 0.03 | 6.98     | 9 / 10   |
+| Q8_0  | ~3.4 GB  | 4.14 +- 0.39 | 3.97     | 9 / 10   |  (re-run, see below)
+| Q4_KM | 2.0 GB   | 6.48 +- 0.40 | 2.57     | 9 / 10   |
++-------+----------+--------------+----------+----------+
+Q4_KM vs FP16: 2.2x faster, 63% less RAM, no accuracy change on this 10-question set.
+
+
+=====================================================================================
+EARLIER SIDE TEST (different quantization, single run, NOT comparable)
+=====================================================================================
++----------------------+-------+----------+----------+
+| Model                | Quant | tok/s    | RAM (GB) |
++----------------------+-------+----------+----------+
+| llama3.2:1b          | Q8_0  | 15.77    | ~1.4     |
+| llama3.2:3b          | Q4_KM | 10.21    | ~2.4     |
++----------------------+-------+----------+----------+
+
+
+LIMITS TO STATE IN THE PAPER
+- 10 questions only: one question = 10 points, small differences are indications not proof.
+- Single laptop, CPU only, short test prompt.
+- Auto-marking uses key text match; answers also read by hand.
+
+NEXT: ollama pull qwen2.5:3b-instruct-fp16, then run_speed.ps1 and run_accuracy.ps1 with -Model qwen2.5:3b-instruct-fp16
+
+
+=====================================================================================
+EXPERIMENT B: KV-CACHE TYPE vs CONTEXT LENGTH  (model llama3.2:3b = Q4_K_M)
+=====================================================================================
+Server started by hand: OLLAMA_FLASH_ATTENTION=1, OLLAMA_KV_CACHE_TYPE=<type>, ollama serve (Ollama 0.40.15).
+Script run_kv.ps1: long numbered-sentence prompt, num_ctx = 4096 / 8192 / 16384, 64 tokens generated,
+model unloaded between contexts (cold). Prompt fills about HALF of num_ctx (2050 / 4098 / 8194 tokens);
+the KV cache is allocated for the full num_ctx.
+
+FIRST PASS, f16 (prompt ended with "Reply with the single word OK" -> only 2-3 tokens generated,
+so the eval rate is NOT valid; RAM and prompt eval numbers are valid). Re-run with a longer answer pending.
++---------+---------------+----------+---------------------+------------------+
+| num_ctx | prompt tokens | RAM (GB) | prompt eval (s)     | prompt eval rate |
++---------+---------------+----------+---------------------+------------------+
+| 4096    | 2050          | 2.57     | 62.7                | 32.71 tok/s      |
+| 8192    | 4098          | 3.13     | 165.5               | 24.76 tok/s      |
+| 16384   | 8194          | 4.09     | 440.3               | 18.61 tok/s      |
++---------+---------------+----------+---------------------+------------------+
+KV cache growth check: RAM +0.96 GB from 8192 -> 16384 (8192 more tokens) = about 117 KB per token.
+Estimate from the model's size (28 layers, 8 KV heads, head dim 128, f16): 112 KB per token. Matches.
+Prompt reading gets slower with longer context (32.7 -> 18.6 tok/s).
+
+--- B1: KV f16 (baseline, flash attention on), valid run, 64 tokens generated each time ---
++---------+---------------+----------+------------+------------------+---------------+-----------+
+| num_ctx | prompt tokens | RAM (GB) | load (s)   | prompt eval rate | eval rate     | total (s) |
+|         |               |          |            | (tok/s, cold)    | (tok/s)       |           |
++---------+---------------+----------+------------+------------------+---------------+-----------+
+| 4096    | 2050          | 2.57     | 3.02       | 33.51            | 4.76          | 77.6      |
+| 8192    | 4098          | 3.13     | 3.24       | 24.81            | 3.37          | 187.5     |
+| 16384   | 8194          | 4.09     | 3.50       | 19.41            | 1.89          | 459.6     |
++---------+---------------+----------+------------+------------------+---------------+-----------+
+Prompt eval rate matches the first pass (32.71 / 24.76 / 18.61) -> repeatable.
+Generation gets much slower with a long context: 4.76 -> 3.37 -> 1.89 tok/s. For comparison, Part 1
+(short prompt, no flash attention set) gave 6.48 tok/s for this model. Each new token must look at the
+whole cache, so a longer cache = more work per token.
+Note: eval rate at 4096 (4.76) is already lower than the 6.48 of Part 1: the prompt is long (2050 tokens)
+and flash attention was switched on; the two effects are not separated in this experiment.
+
+--- B2: KV q8_0 (flash attention on), 64 tokens generated each time ---
++---------+---------------+----------+------------------+-----------+------------+
+| num_ctx | prompt tokens | RAM (GB) | prompt eval rate | eval rate | total (s)  |
+|         |               |          | (tok/s, cold)    | (tok/s)   |            |
++---------+---------------+----------+------------------+-----------+------------+
+| 4096    | 2050          | 2.35     | 15.31            | 4.14      | 152.4      |
+| 8192    | 4098          | 2.69     | 8.09             | 2.87      | 532.2      |
+| 16384   | 8194          | 3.21     | 3.05             | 0.66      | 2794.9     |
++---------+---------------+----------+------------------+-----------+------------+
+
+COMPARISON f16 vs q8_0 KV cache
++---------+------------------------+-------------------------+-------------------------+
+| num_ctx | RAM f16 -> q8_0 (GB)   | prompt rate f16 -> q8_0 | eval rate f16 -> q8_0   |
++---------+------------------------+-------------------------+-------------------------+
+| 4096    | 2.57 -> 2.35 (-0.22)   | 33.51 -> 15.31 (0.46x)  | 4.76 -> 4.14 (0.87x)    |
+| 8192    | 3.13 -> 2.69 (-0.44)   | 24.81 -> 8.09  (0.33x)  | 3.37 -> 2.87 (0.85x)    |
+| 16384   | 4.09 -> 3.21 (-0.88)   | 19.41 -> 3.05  (0.16x)  | 1.89 -> 0.66 (0.35x)    |
++---------+------------------------+-------------------------+-------------------------+
+FINDING: q8_0 KV cache saves about half of the cache memory (0.88 GB at 16384) but on this CPU it is MUCH
+slower, and the slowdown grows with context: the 16384 test took 47 minutes (f16: 7.7 minutes).
+Likely reason (NOT proven): the CPU attention code for a quantized cache is not as optimized and must
+convert the cache values back during every step. Answer text: identical to f16 at 4096 (first 64 tokens);
+similar but not identical at 8192 and 16384 (wording differs after a few words).
+PLAN CHANGE: q4_0 run only for 4096 and 8192 (16384 would likely take 45+ minutes).
+
+--- B3: KV q4_0 (flash attention on), 64 tokens generated; only 4096 and 8192 measured ---
++---------+---------------+----------+------------------+-----------+------------+
+| num_ctx | prompt tokens | RAM (GB) | prompt eval rate | eval rate | total (s)  |
+|         |               |          | (tok/s, cold)    | (tok/s)   |            |
++---------+---------------+----------+------------------+-----------+------------+
+| 4096    | 2050          | 2.23     | 16.32            | 4.51      | 144.2      |
+| 8192    | 4098          | 2.46     | 9.33             | 3.32      | 460.9      |
++---------+---------------+----------+------------------+-----------+------------+
+
+EXPERIMENT B SUMMARY (llama3.2:3b Q4_K_M, CPU only, prompt fills ~50% of num_ctx)
++---------+--------+----------+---------------+------------------+-----------+
+| num_ctx | KV     | RAM (GB) | RAM saved vs  | prompt eval rate | eval rate |
+|         | type   |          | f16           | (tok/s)          | (tok/s)   |
++---------+--------+----------+---------------+------------------+-----------+
+| 4096    | f16    | 2.57     | -             | 33.51            | 4.76      |
+| 4096    | q8_0   | 2.35     | 0.22 GB       | 15.31            | 4.14      |
+| 4096    | q4_0   | 2.23     | 0.34 GB       | 16.32            | 4.51      |
++---------+--------+----------+---------------+------------------+-----------+
+| 8192    | f16    | 3.13     | -             | 24.81            | 3.37      |
+| 8192    | q8_0   | 2.69     | 0.44 GB       | 8.09             | 2.87      |
+| 8192    | q4_0   | 2.46     | 0.67 GB       | 9.33             | 3.32      |
++---------+--------+----------+---------------+------------------+-----------+
+| 16384   | f16    | 4.09     | -             | 19.41            | 1.89      |
+| 16384   | q8_0   | 3.21     | 0.88 GB       | 3.05             | 0.66      |
+| 16384   | q4_0   | not measured (expected 45+ min)                              |
++---------+--------+----------+---------------+------------------+-----------+
+FINDINGS
+1. Cache memory saved: q8_0 about 47%, q4_0 about 72% of the cache (cache itself = 0.47 GB at 4096 f16).
+2. Reading long prompts is 2-3x slower with a quantized cache (q8_0 and q4_0 about equal); at 16384 q8_0 is 6x slower.
+3. Generation speed with q4_0 stays close to f16 (4.51 vs 4.76; 3.32 vs 3.37); q8_0 is slower than q4_0.
+   Odd but measured: the less precise cache is the faster one. Cause not investigated.
+4. Wording of the 64-token answer: q8_0 same as f16 at 4096; q4_0 differs from the first sentence on
+   (still coherent). Only an impression from reading, no quality measurement for the cache.
+5. Conclusion for this laptop: KV-cache quantization saves memory but costs prompt-reading speed; use it
+   only when memory is the limit (very long contexts).
+LIMITS: one run per setup (no repeats because of 8-47 min per setup), prompt filled half of num_ctx,
+no accuracy test for the cache, flash attention turned on for all three (baseline = f16 + flash attention).
+
+--- B3 addendum: KV q4_0 at num_ctx 16384 (measured later, same server settings) ---
+RAM 2.74 GB | prompt tokens 8194 | prompt eval 1566.5 s = 5.23 tok/s | eval 64 tokens in 30.05 s = 2.13 tok/s |
+total 1598.8 s (26.6 min) | load 2.1 s. The answer text started like the f16 answer ("a place of wonder, a sanctuary...").
+
+COMPLETE EXPERIMENT B TABLE (llama3.2:3b Q4_K_M, CPU only)
++---------+--------+----------+--------------+------------------+-----------+------------+
+| num_ctx | KV     | RAM (GB) | RAM saved    | prompt eval rate | eval rate | total time |
+|         | type   |          | vs f16       | (tok/s)          | (tok/s)   | (min)      |
++---------+--------+----------+--------------+------------------+-----------+------------+
+| 4096    | f16    | 2.57     | -            | 33.51            | 4.76      | 1.3        |
+| 4096    | q8_0   | 2.35     | 0.22 GB      | 15.31            | 4.14      | 2.5        |
+| 4096    | q4_0   | 2.23     | 0.34 GB      | 16.32            | 4.51      | 2.4        |
++---------+--------+----------+--------------+------------------+-----------+------------+
+| 8192    | f16    | 3.13     | -            | 24.81            | 3.37      | 3.1        |
+| 8192    | q8_0   | 2.69     | 0.44 GB      | 8.09             | 2.87      | 8.9        |
+| 8192    | q4_0   | 2.46     | 0.67 GB      | 9.33             | 3.32      | 7.7        |
++---------+--------+----------+--------------+------------------+-----------+------------+
+| 16384   | f16    | 4.09     | -            | 19.41            | 1.89      | 7.7        |
+| 16384   | q8_0   | 3.21     | 0.88 GB      | 3.05             | 0.66      | 46.6       |
+| 16384   | q4_0   | 2.74     | 1.35 GB      | 5.23             | 2.13      | 26.6       |
++---------+--------+----------+--------------+------------------+-----------+------------+
+NEW FINDINGS (16384)
+- q4_0 saves 1.35 GB (33% of total RAM) at 16384. Cache is f16 1.9 GB -> about 0.55 GB.
+- Generation with q4_0 (2.13 tok/s) is now FASTER than f16 (1.89): at long context the model reads the whole
+  cache for every token, and a 3.5x smaller cache means less data to read -> same memory-bandwidth idea as Part 1.
+- Prompt reading is still much slower than f16 (5.23 vs 19.41 tok/s): the cache has to be converted to the
+  4-bit format while it is written. Whole test takes 26.6 min instead of 7.7 min.
+- q8_0 is the worst of the three at 16384 on every speed metric (prompt 3.05, eval 0.66). Reason not investigated.
+- One run per setup: differences of a few percent (like 2.13 vs 1.89) are not conclusive.

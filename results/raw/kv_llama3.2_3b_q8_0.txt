@@ -1,0 +1,46 @@
+﻿Model: llama3.2:3b
+KV cache type (label): q8_0
+Ollama version: 0.40.15
+Date: 2026-11-10T12:39:15
+
+--- KV q8_0 | num_ctx 4096 ---
+context length (server):  4096
+RAM (model + KV cache):   2.35 GB
+total duration:           152.385 s
+load duration:            3.007 s
+prompt eval count:        2050 token(s)
+prompt eval duration:     133.89 s
+prompt eval rate:         15.31 tokens/s
+eval count:               64 token(s)
+eval duration:            15.443 s
+eval rate:                4.14 tokens/s
+answer: The library was a place of wonder, a sanctuary for those who sought knowledge and escape. It was a hub of activity, with people of all ages and backgrounds coming to peruse its shelves, attend lectures, and participate in workshops. The library's hours were meticulously recorded, with each day's opening and closing times meticulously
+
+--- KV q8_0 | num_ctx 8192 ---
+context length (server):  8192
+RAM (model + KV cache):   2.69 GB
+total duration:           532.168 s
+load duration:            3.015 s
+prompt eval count:        4098 token(s)
+prompt eval duration:     506.797 s
+prompt eval rate:         8.09 tokens/s
+eval count:               64 token(s)
+eval duration:            22.289 s
+eval rate:                2.87 tokens/s
+answer: The library stood as a beacon of knowledge and learning, its stone walls bearing witness to the countless hours of study, research, and discovery that had taken place within its hallowed halls. For generations, the library had been a cornerstone of the community, a place where people of all ages and backgrounds could come to explore,
+
+--- KV q8_0 | num_ctx 16384 ---
+context length (server):  16384
+RAM (model + KV cache):   3.21 GB
+total duration:           2794.909 s
+load duration:            7.075 s
+prompt eval count:        8194 token(s)
+prompt eval duration:     2690.804 s
+prompt eval rate:         3.05 tokens/s
+eval count:               64 token(s)
+eval duration:            96.881 s
+eval rate:                0.66 tokens/s
+answer: The library stood as a sentinel on the corner of Main and Elm, its stone façade bearing the weight of countless stories and secrets. For decades, it had watched as the world outside its walls changed with the seasons, as children grew up and moved away, and as new families came to call the city home.
+
+Inside
+

@@ -1,0 +1,33 @@
+﻿Model: llama3.2:3b
+KV cache type (label): q4_0
+Ollama version: 0.40.15
+Date: 2026-11-10T15:13:23
+
+--- KV q4_0 | num_ctx 4096 ---
+context length (server):  4096
+RAM (model + KV cache):   2.23 GB
+total duration:           144.245 s
+load duration:            4.401 s
+prompt eval count:        2050 token(s)
+prompt eval duration:     125.617 s
+prompt eval rate:         16.32 tokens/s
+eval count:               64 token(s)
+eval duration:            14.193 s
+eval rate:                4.51 tokens/s
+answer: The library was a place of quiet reverence, a sanctuary for those seeking knowledge and solace. It stood tall and proud, its stone façade bearing the weight of centuries of stories, its doors creaking open to welcome the curious and the wise.
+
+As the sun rose over the city, the library came to life
+
+--- KV q4_0 | num_ctx 8192 ---
+context length (server):  8192
+RAM (model + KV cache):   2.46 GB
+total duration:           460.895 s
+load duration:            2.419 s
+prompt eval count:        4098 token(s)
+prompt eval duration:     439.146 s
+prompt eval rate:         9.33 tokens/s
+eval count:               64 token(s)
+eval duration:            19.294 s
+eval rate:                3.32 tokens/s
+answer: The library stood as a testament to the power of knowledge and learning, its stone walls bearing witness to the countless hours of study, contemplation, and discovery that had taken place within its hallowed halls. For generations, the library had been a beacon of learning, a place where minds were expanded, and ideas were born
+
